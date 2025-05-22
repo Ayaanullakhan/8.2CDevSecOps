@@ -31,17 +31,18 @@ pipeline {
             }
             post {
                 always {
-                    emailext (
-                        subject: "Run Tests Stage - ${currentBuild.currentResult}",
-                        body: """
-                            <p>The <b>Run Tests</b> stage completed with status: <b>${currentBuild.currentResult}</b>.</p>
-                            <p>Refer to the attached test log for more details.</p>
-                        """,
-                        mimeType: 'text/html',
-                        to: "${env.RECIPIENTS}",
-                        replyTo: 'ayaanullakhan11@gmail.com',
-                        attachmentsPattern: 'test.log'
-                    )
+                    script {
+                        def status = currentBuild.result ?: 'SUCCESS'
+                        def buildUrl = env.BUILD_URL
+                        def body = """The Run Tests stage completed with status: ${status}.
+
+Log file: ${buildUrl}artifact/test.log
+Console output: ${buildUrl}console
+"""
+                        mail to: "${env.RECIPIENTS}",
+                             subject: "Run Tests Stage - ${status}",
+                             body: body
+                    }
                 }
             }
         }
@@ -65,19 +66,26 @@ pipeline {
             }
             post {
                 always {
-                    emailext (
-                        subject: "Security Scan Stage - ${currentBuild.currentResult}",
-                        body: """
-                            <p>The <b>Security Scan</b> stage completed with status: <b>${currentBuild.currentResult}</b>.</p>
-                            <p>Refer to the attached audit log for more details.</p>
-                        """,
-                        mimeType: 'text/html',
-                        to: "${env.RECIPIENTS}",
-                        replyTo: 'ayaanullakhan11@gmail.com',
-                        attachmentsPattern: 'audit.log'
-                    )
+                    script {
+                        def status = currentBuild.result ?: 'SUCCESS'
+                        def buildUrl = env.BUILD_URL
+                        def body = """The Security Scan stage completed with status: ${status}.
+
+Log file: ${buildUrl}artifact/audit.log
+Console output: ${buildUrl}console
+"""
+                        mail to: "${env.RECIPIENTS}",
+                             subject: "Security Scan Stage - ${status}",
+                             body: body
+                    }
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: '*.log', fingerprint: true
         }
     }
 }
