@@ -39,7 +39,7 @@ pipeline {
                         """,
                         mimeType: 'text/html',
                         to: "${env.RECIPIENTS}",
-                        replyTo: 'jenkins@example.com',
+                        replyTo: 'ayaanullakhan11@gmail.com',
                         attachmentsPattern: 'test.log'
                     )
                 }
@@ -73,7 +73,7 @@ pipeline {
                         """,
                         mimeType: 'text/html',
                         to: "${env.RECIPIENTS}",
-                        replyTo: 'jenkins@example.com',
+                        replyTo: 'ayaanullakhan11@gmail.com',
                         attachmentsPattern: 'audit.log'
                     )
                 }
