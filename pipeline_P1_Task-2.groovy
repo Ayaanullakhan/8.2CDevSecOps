@@ -33,8 +33,13 @@ pipeline {
                 always {
                     emailext (
                         subject: "Run Tests Stage - ${currentBuild.currentResult}",
-                        body: """<p>The <b>Run Tests</b> stage completed with status: <b>${currentBuild.currentResult}</b>.</p>""",
+                        body: """
+                            <p>The <b>Run Tests</b> stage completed with status: <b>${currentBuild.currentResult}</b>.</p>
+                            <p>Refer to the attached test log for more details.</p>
+                        """,
+                        mimeType: 'text/html',
                         to: "${env.RECIPIENTS}",
+                        replyTo: 'jenkins@example.com',
                         attachmentsPattern: 'test.log'
                     )
                 }
@@ -62,8 +67,13 @@ pipeline {
                 always {
                     emailext (
                         subject: "Security Scan Stage - ${currentBuild.currentResult}",
-                        body: """<p>The <b>Security Scan</b> stage completed with status: <b>${currentBuild.currentResult}</b>.</p>""",
+                        body: """
+                            <p>The <b>Security Scan</b> stage completed with status: <b>${currentBuild.currentResult}</b>.</p>
+                            <p>Refer to the attached audit log for more details.</p>
+                        """,
+                        mimeType: 'text/html',
                         to: "${env.RECIPIENTS}",
+                        replyTo: 'jenkins@example.com',
                         attachmentsPattern: 'audit.log'
                     )
                 }
