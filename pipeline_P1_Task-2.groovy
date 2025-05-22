@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        RECIPIENTS = 'ayaanullakhan11@gmail.com'
+        RECIPIENTS = 'ayaanullakhan11@gmail.com@example.com'
     }
 
     stages {
@@ -21,17 +21,22 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    def status = 'SUCCESS'
                     try {
                         sh 'npm test | tee test.log'
                     } catch (err) {
-                        status = 'FAILURE'
                         currentBuild.result = 'FAILURE'
-                    } finally {
-                        mail to: "${env.RECIPIENTS}",
-                             subject: "Run Tests Stage - ${status}",
-                             body: "The Run Tests stage completed with status: ${status}"
+                        throw err
                     }
+                }
+            }
+            post {
+                always {
+                    emailext (
+                        subject: "Run Tests Stage - ${currentBuild.currentResult}",
+                        body: """<p>The <b>Run Tests</b> stage completed with status: <b>${currentBuild.currentResult}</b>.</p>""",
+                        to: "${env.RECIPIENTS}",
+                        attachmentsPattern: 'test.log'
+                    )
                 }
             }
         }
@@ -45,17 +50,22 @@ pipeline {
         stage('NPM Audit (Security Scan)') {
             steps {
                 script {
-                    def status = 'SUCCESS'
                     try {
                         sh 'npm audit | tee audit.log'
                     } catch (err) {
-                        status = 'FAILURE'
                         currentBuild.result = 'FAILURE'
-                    } finally {
-                        mail to: "${env.RECIPIENTS}",
-                             subject: "Security Scan Stage - ${status}",
-                             body: "The Security Scan stage completed with status: ${status}"
+                        throw err
                     }
+                }
+            }
+            post {
+                always {
+                    emailext (
+                        subject: "Security Scan Stage - ${currentBuild.currentResult}",
+                        body: """<p>The <b>Security Scan</b> stage completed with status: <b>${currentBuild.currentResult}</b>.</p>""",
+                        to: "${env.RECIPIENTS}",
+                        attachmentsPattern: 'audit.log'
+                    )
                 }
             }
         }
